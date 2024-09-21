@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Career Connect</string>
+    <string name="referer_text"><u>referer</u>.</string>
+    <string name="referer_dialog">To sign up as a referer you are allowing interested candidates of your company to reach out for contacts via email or the CareerConnect platform.
+        \n \nThank you for your contributions :)</string>
 </resources>
