@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private boolean login = false; // Variable to track login status
+    private boolean login = true; // Variable to track login status
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

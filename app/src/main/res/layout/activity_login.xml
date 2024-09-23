@@ -29,6 +29,7 @@
             android:layout_gravity="left"
             android:layout_marginTop="20dp"
             android:text="Login to"
+            android:fontFamily=""
             android:textColor="@android:color/white"
             android:textSize="25dp" />
 
