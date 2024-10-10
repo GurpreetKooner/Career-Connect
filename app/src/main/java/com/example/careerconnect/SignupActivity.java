@@ -10,9 +10,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -33,7 +30,7 @@ public class SignupActivity extends AppCompatActivity {
                 if (emailEditText.getText().toString().isEmpty() || passwordEditText.getText().toString().isEmpty()|| nameEditText.getText().toString().isEmpty() || companyEditText.getText().toString().isEmpty()) {
                     Toast.makeText(SignupActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 }else {
-                    Intent intent = new Intent(SignupActivity.this, JobListActivity.class);
+                    Intent intent = new Intent(SignupActivity.this, HomeActivity.class);
                     startActivity(intent);
                 }
             }

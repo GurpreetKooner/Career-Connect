@@ -3,8 +3,6 @@ package com.example.careerconnect;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.animation.ScaleAnimation;
-import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,17 +17,11 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-//        ImageView appLogoImg = findViewById(R.id.app_logo_img);
-//
-//        ScaleAnimation scaler = new ScaleAnimation((float) 0.7, (float) 1.0, (float) 0.7, (float) 1.0);
-//        scaler.setDuration(40);
-//        appLogoImg.startAnimation(scaler);
-
         // Delay for 5 seconds before navigating
         new Handler().postDelayed(() -> {
             if (login) {
-                // Navigate to JobListActivity
-                startActivity(new Intent(MainActivity.this, JobListActivity.class));
+                // Navigate to HomeActivity
+                startActivity(new Intent(MainActivity.this, HomeActivity.class));
             } else {
                 // Navigate to LoginActivity
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));

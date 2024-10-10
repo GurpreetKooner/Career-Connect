@@ -3,4 +3,9 @@
     <string name="referer_text"><u>referer</u>.</string>
     <string name="referer_dialog">To sign up as a referer you are allowing interested candidates of your company to reach out for contacts via email or the CareerConnect platform.
         \n \nThank you for your contributions :)</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="job_list_welcome_text">Here is your recently applied jobs</string>
+    <string name="job_search_welcome_text">Use this search engine to find jobs!</string>
+    <string name="chat_welcome_text">Let’s Chat!</string>
 </resources>

@@ -13,7 +13,7 @@
         android:theme="@style/Theme.CareerConnect"
         tools:targetApi="31">
         <activity
-            android:name=".JobListActivity"
+            android:name=".HomeActivity"
             android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
@@ -27,7 +27,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
