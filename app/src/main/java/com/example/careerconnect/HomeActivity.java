@@ -29,7 +29,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
         ImageView appIconNav = findViewById(R.id.app_icon_nav);
         welcomeText = findViewById(R.id.welcome_text);
-
+        drawerLayout = findViewById(R.id.drawer_layout);
         appIconNav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -37,8 +37,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        drawerLayout.setScrimColor(getResources().getColor(R.color.blue_tint));
 
-        drawerLayout = findViewById(R.id.drawer_layout);
+
+
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 

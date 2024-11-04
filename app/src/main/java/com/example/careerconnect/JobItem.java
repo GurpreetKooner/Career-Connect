@@ -5,12 +5,21 @@ public class JobItem {
     String companyName;
     String location;
     String postedOn;
+    boolean isSaved;
 
     public JobItem(String jobTitle, String companyName, String location, String postedOn) {
         this.jobTitle = jobTitle;
         this.companyName = companyName;
         this.location = location;
         this.postedOn = postedOn;
+    }
+
+    public JobItem(String jobTitle, String companyName, String location, String postedOn, boolean isSaved) {
+        this.jobTitle = jobTitle;
+        this.companyName = companyName;
+        this.location = location;
+        this.postedOn = postedOn;
+        this.isSaved = isSaved;
     }
 
     public String getJobTitle() {
@@ -43,5 +52,9 @@ public class JobItem {
 
     public void setPostedOn(String postedOn) {
         this.postedOn = postedOn;
+    }
+
+    public boolean isSaved() {
+        return isSaved;
     }
 }
