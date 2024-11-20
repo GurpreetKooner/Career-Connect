@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "680950739791",
+    "project_id": "careerconnect-e9f06",
+    "storage_bucket": "careerconnect-e9f06.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:680950739791:android:c01eb3368ec36a16d3cb3a",
+        "android_client_info": {
+          "package_name": "com.example.careerconnect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATeKcQO-rChW8V4MqCu9ygd8IBuBHm0U0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
