@@ -66,7 +66,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new JobSearchFragment()).commit();
             welcomeText.setText(R.string.job_search_welcome_text);
         } else if (itemId == R.id.nav_chat) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ChatFragment()).commit();
+//            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ChatFragment()).commit();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new UserListFragment())
+                    .commit();
             welcomeText.setText(R.string.chat_welcome_text);
         }
 
