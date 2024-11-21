@@ -135,6 +135,8 @@ public class JobSearchFragment extends Fragment {
                                 intent.putExtra("jobLocation", job.location);
                                 intent.putExtra("jobUpdated", job.updated);
                                 intent.putExtra("description", job.snippet);
+                                intent.putExtra("jobUrl", job.link);
+                                Log.d("JobDetailActivity", "Job Description From intentCall: " + job.snippet);
                                 startActivity(intent);
                             });
                             recyclerView.setAdapter(jobAdapter);

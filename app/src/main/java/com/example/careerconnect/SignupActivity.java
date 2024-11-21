@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.android.material.materialswitch.MaterialSwitch;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,7 +75,7 @@ public class SignupActivity extends AppCompatActivity {
         user.put("company", company);
         user.put("email", email);
         user.put("isReferer", isReferer); // Include the referer boolean in the database
-
+        user.put("friend", new ArrayList<String>()); // Initialize friend as null)
         db.collection("users").document(uid)
                 .set(user)
                 .addOnSuccessListener(aVoid -> {

@@ -1,18 +1,26 @@
 package com.example.careerconnect;
 
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +34,13 @@ public class ChatFragment extends Fragment {
     private List<ChatAdapter.Message> messages;
     private TextView userNameTextView, userEmailTextView, emptyPlaceholder;
 
+    private FirebaseFirestore db;
+    private String currentUserId;
+    private String friendId;
+
     private static final String ARG_USER_NAME = "userName";
     private static final String ARG_USER_EMAIL = "userEmail";
+    private static final String ARG_FRIEND_ID = "friendId";
 
     private String userName;
     private String userEmail;
@@ -36,9 +49,10 @@ public class ChatFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static ChatFragment newInstance(String userName, String userEmail) {
+    public static ChatFragment newInstance(String friendId, String userName, String userEmail) {
         ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
+        args.putString(ARG_FRIEND_ID, friendId);
         args.putString(ARG_USER_NAME, userName);
         args.putString(ARG_USER_EMAIL, userEmail);
         fragment.setArguments(args);
@@ -48,19 +62,20 @@ public class ChatFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Initialize the messages list
         messages = new ArrayList<>();
+        db = FirebaseFirestore.getInstance();
+        currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         if (getArguments() != null) {
+            friendId = getArguments().getString(ARG_FRIEND_ID);
+            Log.d("ChatFragment", "Friend ID: " + ARG_FRIEND_ID + friendId + ARG_USER_NAME);
             userName = getArguments().getString(ARG_USER_NAME);
             userEmail = getArguments().getString(ARG_USER_EMAIL);
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_chatbox, container, false);
     }
 
@@ -92,22 +107,70 @@ public class ChatFragment extends Fragment {
         // Show placeholder message if chat is empty
         updateEmptyState();
 
+        // Load chat messages
+        if (friendId != null) {
+            loadMessages();
+        } else {
+            Toast.makeText(getContext(), "Invalid friend ID", Toast.LENGTH_SHORT).show();
+        }
+
         // Set up send button functionality
-        sendButton.setOnClickListener(v -> {
-            String messageText = messageInput.getText().toString().trim();
-            if (!messageText.isEmpty()) {
-                // Add the new message to the list and update the RecyclerView
-                messages.add(new ChatAdapter.Message(messageText, true)); // true for sent messages
-                chatAdapter.notifyItemInserted(messages.size() - 1);
-                chatRecyclerView.scrollToPosition(messages.size() - 1);
+        sendButton.setOnClickListener(v -> sendMessage());
+    }
 
-                // Clear the input field
-                messageInput.setText("");
+    private void loadMessages() {
+        db.collection("chats")
+                .document(getChatId(currentUserId, friendId))
+                .collection("messages")
+                .orderBy("timestamp", Query.Direction.ASCENDING)
+                .addSnapshotListener((querySnapshot, error) -> {
+                    if (error != null) {
+                        Log.e("ChatFragment", "Error loading messages: " + error.getMessage());
+                        return;
+                    }
 
-                // Remove empty state if a message is sent
-                updateEmptyState();
-            }
-        });
+                    if (querySnapshot != null) {
+                        messages.clear();
+                        for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                            String text = document.getString("message");
+                            String sender = document.getString("sender");
+
+                            boolean isSent = currentUserId.equals(sender);
+                            messages.add(new ChatAdapter.Message(text, isSent));
+                        }
+
+                        chatAdapter.notifyDataSetChanged();
+                        chatRecyclerView.scrollToPosition(messages.size() - 1);
+                        updateEmptyState();
+                    }
+                });
+    }
+
+    private void sendMessage() {
+        String messageText = messageInput.getText().toString().trim();
+        if (TextUtils.isEmpty(messageText)) {
+            return;
+        }
+
+        Long timestamp = System.currentTimeMillis();
+        String chatId = getChatId(currentUserId, friendId);
+
+        ChatMessage chatMessage = new ChatMessage(currentUserId, friendId, messageText, timestamp);
+
+        db.collection("chats")
+                .document(chatId)
+                .collection("messages")
+                .add(chatMessage)
+                .addOnSuccessListener(aVoid -> {
+                    messageInput.setText("");
+                    Log.d("ChatFragment", "Message sent successfully");
+                })
+                .addOnFailureListener(e -> Log.e("ChatFragment", "Error sending message: " + e.getMessage()));
+    }
+
+    private String getChatId(String userId1, String userId2) {
+        // Ensure consistent chat ID generation
+        return userId1.compareTo(userId2) < 0 ? userId1 + "_" + userId2 : userId2 + "_" + userId1;
     }
 
     private void updateEmptyState() {
