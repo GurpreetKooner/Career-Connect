@@ -5,4 +5,7 @@
     <color name="yellow">#FFD700</color>
     <color name="blue">#005EFF</color>
     <color name="blue_tint">#36005EFF</color>
+    <color name="light_gray">#F2F2F2</color>
+    <color name="light_yellow">#FFF9C4</color>
+    <color name="blue_outline">#005EFF</color>
 </resources>

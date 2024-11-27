@@ -2,78 +2,134 @@ package com.example.careerconnect;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowCompat;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class JobDetailActivity extends AppCompatActivity {
+
+    private FirebaseFirestore db;
+    private LinearLayout refererLayout;
+    private LinearLayout refererList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_job_detail);
+
+        // Initialize Firestore
+        db = FirebaseFirestore.getInstance();
+
+        // Find views
         TextView jobTitle = findViewById(R.id.job_title);
         TextView companyName = findViewById(R.id.company_name);
         TextView postedOn = findViewById(R.id.posted_on);
         TextView jobDescription = findViewById(R.id.job_description);
-        TextView jobLocation = findViewById(R.id.job_location);
-        Button applyButton = findViewById(R.id.apply_button);
+        refererLayout = findViewById(R.id.referer_layout);
+        refererList = findViewById(R.id.referer_list);
 
+        // Get data from intent
         String title = getIntent().getStringExtra("jobTitle");
         String company = getIntent().getStringExtra("jobCompany");
-        String dateString = getIntent().getStringExtra("jobUpdated");
         String description = getIntent().getStringExtra("description");
-        String location = getIntent().getStringExtra("jobLocation");
 
-        description = formatString(description);
-
-        // Parse the string to a LocalDateTime object, ignoring the fractional seconds
-        LocalDateTime dateTime = LocalDateTime.parse(dateString.split("\\.")[0]);
-
-        // Define the desired format
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-
-        // Format the date
-        String formattedDate = dateTime.format(formatter);
-        String postedOnText = "Posted on " + formattedDate;
-
-
-        Log.d("JobDetailActivity", "Job Title: " + title);
-
-        applyButton.setOnClickListener(v -> {
-            // Handle apply button click
-        });
-
+        // Set data to views
         jobTitle.setText(title);
         companyName.setText(company);
-        postedOn.setText(postedOnText);
-        jobLocation.setText(location);
         jobDescription.setText(description);
 
+        // Load referrers for the company
+        loadReferrers(company);
     }
 
-    public static String formatString(String input) {
-        // Replace HTML non-breaking spaces with regular spaces
-        input = input.replaceAll("&nbsp;", " ");
+    private void loadReferrers(String company) {
+        db.collection("users")
+                .whereEqualTo("company", company)
+                .whereEqualTo("isReferer", true) // Filter users who opted in as referrers
+                .limit(10) // Limit results to 10
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        refererLayout.setVisibility(View.GONE);
+                    } else {
+                        refererLayout.setVisibility(View.VISIBLE);
 
-        // Remove all HTML tags
-        input = input.replaceAll("<[^>]+>", "");
+                        for (DocumentSnapshot document : queryDocumentSnapshots) {
+                            // Create User object with Firestore document ID
+                            User user = document.toObject(User.class);
+                            if (user != null) {
+                                user.setId(document.getId());
+                            }
 
-        // Replace escape characters with line breaks or spaces
-        input = input.replaceAll("\r\n", "\n"); // Replace with a newline for better formatting
+                            // Inflate and populate referer item view
+                            View referrerView = getLayoutInflater().inflate(R.layout.referer_item, refererList, false);
+                            ((TextView) referrerView.findViewById(R.id.referer_name)).setText(user.getName());
+                            ((TextView) referrerView.findViewById(R.id.referer_email)).setText(user.getEmail());
 
-        // Trim leading/trailing spaces and extra newlines
-        input = input.trim();
+                            // Set click listener to add the referer as a friend
+                            referrerView.setOnClickListener(v -> addRefererAsFriend(user));
 
-        return input;
+                            refererList.addView(referrerView);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Toast.makeText(JobDetailActivity.this, "Failed to load referrers: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    private void addRefererAsFriend(User user) {
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Update the 'friends' list field in the current user's document
+        db.collection("users")
+                .document(currentUserId)
+                .update("friends", FieldValue.arrayUnion(user.getId()))
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, user.getName() + " added to your friend list!", Toast.LENGTH_SHORT).show();
+                    // Optionally, add a message or take other actions
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to add friend: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+        db.collection("users")
+                .document(user.getId())
+                .update("friends", FieldValue.arrayUnion(currentUserId))
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, user.getName() + " added to your friend list!", Toast.LENGTH_SHORT).show();
+                    // Optionally, add a message or take other actions
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to add friend: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void addStartingMessage(String currentUserId, String friendId) {
+        Map<String, Object> message = new HashMap<>();
+        message.put("sender", currentUserId);
+        message.put("receiver", friendId);
+        message.put("message", "Hi! Let's start chatting.");
+        message.put("timestamp", System.currentTimeMillis());
+
+        db.collection("users")
+                .document(currentUserId)
+                .collection("friends")
+                .document(friendId)
+                .collection("messages")
+                .add(message)
+                .addOnSuccessListener(aVoid -> Log.d("ChatSystem", "Starting message sent successfully"))
+                .addOnFailureListener(e -> Log.e("ChatSystem", "Failed to send starting message: " + e.getMessage()));
     }
 }

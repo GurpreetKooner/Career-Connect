@@ -2,12 +2,15 @@ package com.example.careerconnect;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -21,14 +24,21 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+// Import necessary for Drawable
+import android.graphics.drawable.Drawable;
+import androidx.core.content.ContextCompat;
+
 public class JobSearchFragment extends Fragment {
 
-    SearchJobListAdapter jobAdapter;
-    RecyclerView recyclerView;
-    ProgressBar progressBar;
-    Button loadMoreButton;
-    List<Job> jobList = new ArrayList<>();
-    int currentPage = 1;
+    private SearchJobListAdapter jobAdapter;
+    private RecyclerView recyclerView;
+    private ProgressBar progressBar;
+    private Button loadMoreButton;
+    private List<Job> jobList = new ArrayList<>();
+    private int currentPage = 1;
+
+    private EditText searchJobInput;
+    private String currentKeyword = "IT"; // Default keyword
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,23 +46,69 @@ public class JobSearchFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_job_search, container, false);
 
-        // Set up the RecyclerView
-        recyclerView = view.findViewById(R.id.search_job_list); // Use 'view' to find the RecyclerView
+        // Initialize views
+        recyclerView = view.findViewById(R.id.search_job_list);
         progressBar = view.findViewById(R.id.loading_progress_bar);
         loadMoreButton = view.findViewById(R.id.load_more_button);
+        searchJobInput = view.findViewById(R.id.search_job_input);
 
-        progressBar.setVisibility(View.VISIBLE);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext())); // Use 'getContext()' in fragments
+        // Set up the initial job list with default keyword
+        fetchJobs(currentPage, currentKeyword);
 
-        fetchJobs(currentPage);
-        loadMoreButton.setOnClickListener(v -> fetchJobs(++currentPage));
+        // Set up the touch listener for the search icon in the EditText
+        searchJobInput.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                Drawable drawableEnd = searchJobInput.getCompoundDrawables()[2];
+                if (drawableEnd != null) {
+                    int drawableWidth = drawableEnd.getBounds().width();
+                    if (event.getRawX() >= (searchJobInput.getRight() - drawableWidth - searchJobInput.getPaddingRight())) {
+                        // User tapped on the drawableEnd (search icon)
+                        performSearch();
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
+
+        // Load more button click listener
+        loadMoreButton.setOnClickListener(v -> fetchJobs(++currentPage, currentKeyword));
+
         return view;
     }
 
-    private void fetchJobs(int page) {
+    private void performSearch() {
+        Log.d("JobSearchFragment", "Search icon clicked");
+        // Reset the job list and current page
+        jobList.clear();
+        currentPage = 1;
 
-        JobRequest request = new JobRequest("it", "US", page, 10);
+        // Get the keyword from the search input
+        String keyword = searchJobInput.getText().toString().trim();
+
+        // If the search input is empty, use default keyword "IT"
+        if (TextUtils.isEmpty(keyword)) {
+            currentKeyword = "IT";
+        } else {
+            currentKeyword = keyword;
+        }
+
+        // Clear the adapter and notify data set changed
+        if (jobAdapter != null) {
+            jobAdapter.notifyDataSetChanged();
+        }
+
+        // Fetch jobs with the new keyword
+        fetchJobs(currentPage, currentKeyword);
+    }
+
+    private void fetchJobs(int page, String keyword) {
+        Log.d("JobSearchFragment", "Fetching jobs for keyword: " + keyword + ", page: " + page);
+        progressBar.setVisibility(View.VISIBLE);
+
+        JobRequest request = new JobRequest(keyword, "US", page, 10);
         JobService jobService = RetrofitInstance.getRetrofitInstance().create(JobService.class);
 
         jobService.getJobs(request).enqueue(new Callback<JobResponse>() {
@@ -62,7 +118,11 @@ public class JobSearchFragment extends Fragment {
 
                 if (response.isSuccessful() && response.body() != null) {
                     List<Job> newJobs = response.body().jobs;
-                    if (newJobs.isEmpty()) {
+                    if (newJobs == null || newJobs.isEmpty()) {
+                        if (currentPage == 1) {
+                            // No jobs found for the keyword
+                            Toast.makeText(getContext(), "No jobs found for '" + keyword + "'", Toast.LENGTH_SHORT).show();
+                        }
                         loadMoreButton.setVisibility(View.GONE); // Hide if no more jobs
                     } else {
                         jobList.addAll(newJobs);
@@ -71,26 +131,30 @@ public class JobSearchFragment extends Fragment {
                             jobAdapter.setOnItemClickListener(job -> {
                                 Intent intent = new Intent(getContext(), JobDetailActivity.class);
                                 intent.putExtra("jobTitle", job.title);
-//                                Log.d("JobDetailActivity", "Job Title: " + job.title);
                                 intent.putExtra("jobCompany", job.company);
                                 intent.putExtra("jobLocation", job.location);
                                 intent.putExtra("jobUpdated", job.updated);
                                 intent.putExtra("description", job.snippet);
+                                intent.putExtra("jobUrl", job.link);
+                                Log.d("JobDetailActivity", "Job Description From intentCall: " + job.snippet);
                                 startActivity(intent);
                             });
                             recyclerView.setAdapter(jobAdapter);
                         } else {
-                            jobAdapter.notifyItemRangeInserted(jobList.size() - newJobs.size(), newJobs.size());
+                            jobAdapter.notifyDataSetChanged();
                         }
                         loadMoreButton.setVisibility(View.VISIBLE); // Show if more jobs are available
                     }
+                } else {
+                    Toast.makeText(getContext(), "Failed to fetch jobs", Toast.LENGTH_SHORT).show();
+                    Log.e("JobSearchFragment", "Response unsuccessful or body is null");
                 }
             }
 
             @Override
             public void onFailure(Call<JobResponse> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
-                Log.e("API Error", "Failed to fetch jobs: " + t.getMessage());
+                Log.e("JobSearchFragment", "Failed to fetch jobs: " + t.getMessage());
                 Toast.makeText(getContext(), "Failed to fetch jobs", Toast.LENGTH_SHORT).show();
             }
         });

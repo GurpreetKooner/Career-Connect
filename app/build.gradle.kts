@@ -1,5 +1,6 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.androidApplication)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -26,20 +27,31 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8 // Adjust as needed
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
 
 dependencies {
+    // Firebase BoM
+    implementation(platform(libs.firebaseBom))
+    // Firebase Firestore
+    implementation(libs.firebaseFirestore)
+    implementation(libs.firebaseAuth)
 
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
     implementation(libs.retrofit)
     implementation(libs.gson)
+    implementation(libs.firebaseAuth)
+
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.extJunit)
+    androidTestImplementation(libs.espressoCore)
+    implementation(libs.retrofitGsonConverter)
 }
+
+// Apply the Google Services plugin
+apply(plugin = "com.google.gms.google-services")
