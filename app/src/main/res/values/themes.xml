@@ -5,7 +5,11 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="android:fontFamily">@font/consolas</item>
         <item name="android:windowTranslucentStatus">false</item>
+
+
     </style>
 
     <style name="Theme.CareerConnect" parent="Base.Theme.CareerConnect" />
+
+
 </resources>
