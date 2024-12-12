@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+
+
+    <RadioGroup
+        android:id="@+id/status_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/status_saved"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Saved" />
+
+        <RadioButton
+            android:id="@+id/status_applied"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Applied" />
+
+        <RadioButton
+            android:id="@+id/status_contacted"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Contacted" />
+
+        <RadioButton
+            android:id="@+id/status_hired"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hired" />
+
+        <RadioButton
+            android:id="@+id/status_rejected"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rejected" />
+    </RadioGroup>
+</LinearLayout>

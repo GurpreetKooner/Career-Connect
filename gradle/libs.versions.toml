@@ -12,6 +12,7 @@ gson = "2.9.0"
 retrofitGsonConverter = "2.9.0"
 firebaseBom = "33.6.0"
 firebaseAuth = "22.1.1"
+activityVersion = "1.8.0"
 
 
 [libraries]
@@ -29,6 +30,7 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 firebaseBom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebaseAuth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebaseFirestore = { group = "com.google.firebase", name = "firebase-firestore" }
+androidxActivity = { group = "androidx.activity", name = "activity", version.ref = "activityVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

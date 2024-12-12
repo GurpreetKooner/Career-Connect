@@ -94,20 +94,27 @@
 
 package com.example.careerconnect;
 
+import static com.google.android.material.internal.ViewUtils.getBackgroundColor;
+
+import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class SearchJobListAdapter extends RecyclerView.Adapter<SearchJobViewHolder> {
+public class SaveJobListAdapter extends RecyclerView.Adapter<SaveJobViewHolder> {
 
     Context context;
     List<Job> jobItems;
@@ -124,7 +131,7 @@ public class SearchJobListAdapter extends RecyclerView.Adapter<SearchJobViewHold
         void onSaveJobClick(int position);
     }
 
-    public SearchJobListAdapter(Context context, List<Job> jobItems) {
+    public SaveJobListAdapter(Context context, List<Job> jobItems) {
         this.context = context;
         this.jobItems = jobItems;
     }
@@ -139,55 +146,22 @@ public class SearchJobListAdapter extends RecyclerView.Adapter<SearchJobViewHold
 
     @NonNull
     @Override
-    public SearchJobViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new SearchJobViewHolder(LayoutInflater.from(context).inflate(R.layout.search_job_item_view, parent, false));
+    public SaveJobViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new SaveJobViewHolder(LayoutInflater.from(context).inflate(R.layout.save_job_item_view, parent, false));
     }
 
-//    @Override
-//    public void onBindViewHolder(@NonNull SearchJobViewHolder holder, int position) {
-//        Job job = jobItems.get(position);
-//        holder.jobTitle.setText(job.title);
-//        holder.companyName.setText(job.company);
-//        holder.location.setText(job.location);
-//
-//        // Format the date for display
-//        String dateString = job.updated;
-//        LocalDateTime dateTime = LocalDateTime.parse(dateString.split("\\.")[0]);
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-//        String formattedDate = dateTime.format(formatter);
-//        String postedOnText = "Posted on " + formattedDate;
-//        holder.postedOn.setText(postedOnText);
-//
-//        // Set item click listener
-//        holder.itemView.setOnClickListener(v -> {
-//            if (onItemClickListener != null) {
-//                onItemClickListener.onItemClick(job);
-//            }
-//        });
-//
-//        // Set save button click listener
-//        holder.saveJob.setOnClickListener(v -> {
-//            if (onSaveJobClickListener != null) {
-//                onSaveJobClickListener.onSaveJobClick(position); // Notify parent via callback
-//            }
-//        });
-//
-//        // Update UI based on job saved state
-//        if (job.isSaved()) {
-//            holder.saveJobIcon.setImageResource(R.drawable.save_white_icon);
-//            holder.saveJob.setText("Saved");
-//        } else {
-//            holder.saveJobIcon.setImageResource(R.drawable.save_black_icon);
-//            holder.saveJob.setText("Save");
-//        }
-//    }
 
     @Override
-    public void onBindViewHolder(@NonNull SearchJobViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SaveJobViewHolder holder, int position) {
         Job job = jobItems.get(position);
         holder.jobTitle.setText(job.title);
         holder.companyName.setText(job.company);
         holder.location.setText(job.location);
+        holder.jobStatus.setText(job.status);
+
+       // Set background color based on status
+        int backgroundColor = getBackgroundColor(job.status);
+       holder.jobStatus.setBackgroundResource(backgroundColor);
 
         // Format the date for display
         String dateString = job.updated;
@@ -204,21 +178,76 @@ public class SearchJobListAdapter extends RecyclerView.Adapter<SearchJobViewHold
             }
         });
 
-        // Set save button click listener
-        holder.saveJob.setOnClickListener(v -> {
-            if (onSaveJobClickListener != null) {
-                onSaveJobClickListener.onSaveJobClick(position); // Notify parent via callback
-            }
+        // Add click listener for update job layout
+        holder.updateJobLayout.setOnClickListener(v -> {
+            createUpdateJobStatusDialog(context, holder, job).show();
         });
 
-        // Update UI based on job saved state
-        if (job.isSaved()) {
-            holder.saveJobIcon.setImageResource(R.drawable.save_white_icon);
-            holder.saveJob.setText("Saved");
-        } else {
-            holder.saveJobIcon.setImageResource(R.drawable.save_black_icon);
-            holder.saveJob.setText("Save");
+    }
+
+    private AlertDialog createUpdateJobStatusDialog(Context context, SaveJobViewHolder holder, Job job) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_update_job_status, null);
+        RadioGroup statusRadioGroup = dialogView.findViewById(R.id.status_radio_group);
+
+        return builder.setTitle("Update Job Status")
+                .setView(dialogView)
+                .setPositiveButton("Update", (dialog, which) -> {
+                    int selectedStatusId = statusRadioGroup.getCheckedRadioButtonId();
+                    String selectedStatus = getSelectedStatus(selectedStatusId);
+
+                    updateJobStatusUI(holder, selectedStatus);
+                    updateJobStatusInFirestore(job, selectedStatus);
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+    }
+
+    private String getSelectedStatus(int selectedStatusId) {
+        if (selectedStatusId == R.id.status_applied) return "Applied";
+        if (selectedStatusId == R.id.status_saved) return "Saved";
+        if (selectedStatusId == R.id.status_contacted) return "Contacted";
+        if (selectedStatusId == R.id.status_hired) return "Hired";
+        if (selectedStatusId == R.id.status_rejected) return "Rejected";
+        return "Saved";
+    }
+
+    private void updateJobStatusUI(SaveJobViewHolder holder, String status) {
+        holder.jobStatus.setText(status);
+
+        int backgroundColor = getBackgroundColor(status);
+        holder.jobStatus.setBackgroundResource(backgroundColor);
+    }
+
+    private static int getBackgroundColor(String status) {
+        switch (status) {
+            case "Applied": return R.color.blue;
+            case "Contacted": return R.color.orange;
+            case "Hired": return R.color.green_light;
+            case "Rejected": return R.color.red_light;
+            default: return R.color.sky_blue;
         }
+    }
+
+    private void updateJobStatusInFirestore(Job job, String status) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+        db.collection("users")
+                .document(mAuth.getCurrentUser().getUid())
+                .collection("savedJobs")
+                .whereEqualTo("title", job.title)
+                .whereEqualTo("company", job.company)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        queryDocumentSnapshots.getDocuments().get(0).getReference()
+                                .update("status", status)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(context, "Job status updated to " + status, Toast.LENGTH_SHORT).show();
+                                });
+                    }
+                });
     }
 
 

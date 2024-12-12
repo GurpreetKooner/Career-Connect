@@ -9,51 +9,51 @@
     <!-- Outer container with outline -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_height="676dp"
         android:background="@drawable/blue_outline_box"
+        android:orientation="vertical"
         android:padding="16dp">
 
         <!-- Header with User Info -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:paddingBottom="8dp">
 
             <!-- User Info -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginStart="8dp">
+                android:layout_marginStart="8dp"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/userName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="NAME"
-                    android:textStyle="bold"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/userEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Email@email.com"
-                    android:textSize="14sp"
-                    android:textColor="#888888" />
+                    android:textColor="#888888"
+                    android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
 
         <!-- Chat Messages Area -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="494dp"
             android:layout_weight="1"
-            android:orientation="vertical"
             android:background="@drawable/blue_outline_box"
+            android:orientation="vertical"
             android:padding="8dp">
 
             <!-- FrameLayout to overlap the placeholder and RecyclerView -->
@@ -68,8 +68,8 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="No messages yet"
-                    android:textSize="16sp"
                     android:textColor="#888888"
+                    android:textSize="16sp"
                     android:visibility="visible" />
 
                 <!-- Chat Messages RecyclerView -->
@@ -86,10 +86,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/blue_outline_box">
+            android:background="@drawable/blue_outline_box"
+            android:orientation="horizontal"
+            android:padding="8dp">
 
             <!-- Text Input -->
             <EditText
@@ -97,20 +97,20 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Type a message"
-                android:padding="8dp"
                 android:background="@android:color/transparent"
-                android:inputType="text" />
+                android:hint="Type a message"
+                android:inputType="text"
+                android:padding="8dp" />
 
             <!-- Send Button -->
             <ImageButton
                 android:id="@+id/sendButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@android:drawable/ic_menu_send"
+                android:layout_marginStart="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Send Message"
-                android:layout_marginStart="8dp" />
+                android:src="@android:drawable/ic_menu_send" />
         </LinearLayout>
 
     </LinearLayout>

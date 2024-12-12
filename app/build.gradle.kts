@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.gson)
     implementation(libs.firebaseAuth)
+    implementation(libs.androidxActivity)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.extJunit)

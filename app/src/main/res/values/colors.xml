@@ -8,4 +8,9 @@
     <color name="light_gray">#F2F2F2</color>
     <color name="light_yellow">#FFF9C4</color>
     <color name="blue_outline">#005EFF</color>
+    <color name="sky_blue">#2a93a5</color>
+    <color name="orange">#ec8a4a</color>
+    <color name="green_light">#0fa90c</color>
+    <color name="red_light">#bf260e</color>
+    <color name="gray_light">#F5F5F5</color>
 </resources>

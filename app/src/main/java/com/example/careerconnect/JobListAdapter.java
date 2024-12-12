@@ -20,6 +20,7 @@ public class JobListAdapter extends RecyclerView.Adapter<JobViewHolder>{
         this.jobItems = jobItems;
     }
 
+
     @NonNull
     @Override
     public JobViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

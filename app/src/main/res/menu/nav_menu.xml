@@ -5,9 +5,9 @@
 
     <group
         android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_job_list"
-            android:title="Your Job Board" />
+<!--        <item-->
+<!--            android:id="@+id/nav_job_list"-->
+<!--            android:title="Your Job Board" />-->
 
         <item
             android:id="@+id/nav_job_search"
@@ -18,8 +18,16 @@
             android:title="Chat" />
 
         <item
+            android:id="@+id/nav_saved"
+            android:title="Saved Jobs" />
+
+        <item
             android:id="@+id/nav_setting"
             android:title="Setting" />
+
+        <item
+            android:id="@+id/nav_logout"
+            android:title="Logout" />
 
     </group>
 

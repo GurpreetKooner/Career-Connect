@@ -32,50 +32,76 @@
                 android:textColor="@color/black"
                 android:textSize="18dp" />
 
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/search_company_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Company"
-                    android:textColor="@color/black"
-                    android:textSize="15dp" />
-
+                android:orientation="horizontal">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:scaleX="0.8"
-                        android:scaleY="0.8"
-                        android:src="@drawable/location_icon" />
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/search_location"
+                        android:id="@+id/search_company_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Company"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Location"
-                        android:textSize="15dp" />
+                        android:layout_marginTop="5dp"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:scaleX="0.8"
+                            android:scaleY="0.8"
+                            android:src="@drawable/location_icon" />
+
+                        <TextView
+                            android:id="@+id/search_location"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Location"
+                            android:textSize="15dp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/search_posted_on"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="Posted on dd/mm/yy" />
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/search_posted_on"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="Posted on dd/mm/yy" />
+                <LinearLayout
+                    android:layout_width="220dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/job_status"
+                        android:layout_width="110dp"
+                        android:layout_height="wrap_content"
+                        android:background="@color/sky_blue"
+                        android:padding="3dp"
+                        android:text="Saved"
+                        android:textAlignment="center"
+                        android:textColor="@color/white" />
+
+                </LinearLayout>
+
             </LinearLayout>
+
 
         </LinearLayout>
 
@@ -85,7 +111,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/search_save_job_layout"
+                android:id="@+id/update_save_job_layout"
                 android:layout_width="match_parent"
                 android:layout_height="35dp"
                 android:layout_weight="1"
@@ -94,17 +120,12 @@
                 android:gravity="center"
                 android:padding="5dp">
 
-                <ImageView
-                    android:id="@+id/search_save_job_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/save_black_icon"/>
                 <TextView
-                    android:id="@+id/search_save_job"
+                    android:id="@+id/update_job_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
-                    android:text="Save" />
+                    android:text="Update Status" />
 
             </LinearLayout>
             <View
@@ -128,7 +149,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
-                    android:text="Details" />
+                    android:text="View Details" />
 
             </LinearLayout>
 
